@@ -106,7 +106,12 @@ def read_simulated_radios(json_path):
                     if item["radioTechnology"] != "BLUETOOTH": #Exclude Bluetooth radios
                         slot_config = {}
                         slot_config[item["accessPointIndex"]] = {}
-                        slot_config[item["accessPointIndex"]]["channel"] = freq_to_channel(item["channelByCenterFrequencyDefinedNarrowChannels"][0])
+                        try:
+                            slot_config[item["accessPointIndex"]]["channel"] = freq_to_channel(item["channelByCenterFrequencyDefinedNarrowChannels"][0])
+                        except IndexError:
+                            slot_config[item["accessPointIndex"]]["channel"] = 0
+                            info()
+                            print("Simulated radio does not have channel, setting to 0")
                         slot_config[item["accessPointIndex"]]["antennaid"] = item["antennaTypeId"]
                         slot_config[item["accessPointIndex"]]["antennamounting"] = item["antennaMounting"]
                         slot_config[item["accessPointIndex"]]["antennaheight"] = round(item["antennaHeight"], 1)
@@ -132,7 +137,12 @@ def read_antenna_types(json_path):
     else:
         for ap in all_aps:
             for slot, config in ap.slots.items():
-                ap.slots[slot]["antennatype"] = next(item["name"] for item in antennas["antennaTypes"] if item["id"] == config["antennaid"])
+                try:
+                    ap.slots[slot]["antennatype"] = next((item["name"] for item in antennas["antennaTypes"] if item["id"] == config["antennaid"]), "NA")
+                except KeyError:
+                    ap.slots[slot]["antennatype"] = "NULL"
+                    info()
+                    print("Antenna does not have name, setting to NULL")
 
     
 def freq_to_channel(freq):
