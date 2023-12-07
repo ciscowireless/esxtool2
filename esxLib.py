@@ -50,6 +50,7 @@ def read_floors_plans(json_path):
         floor.height = item["height"]
         floor.image = item["imageId"]
         floor.scaling = item["metersPerUnit"]
+        floor.points = ""
 
         all_floors.append(floor)
 
@@ -63,7 +64,12 @@ def read_reference_points(json_path):
         info()
         print(f"Not found: {colorama.Fore.YELLOW}referencePoints.json{colorama.Fore.RESET}")
     else:
-        pass
+        for reference in reference_points["referencePoints"]:
+            for point in reference["projections"]:
+                x = round(float(point["coord"]["x"]), 1)
+                y = round(float(point["coord"]["y"]), 1)
+                floor_index = next((index for index, floor in enumerate(all_floors) if floor.id == point["floorPlanId"]), None)
+                all_floors[floor_index].points += f"({x}:{y})" 
 
 
 def read_access_points(json_path):

@@ -120,9 +120,7 @@ def save_csv_floors(floors, filepath, filename):
                 "Width",
                 "Height",
                 "Scaling (m/unit)",
-                "ReferencePoint 1",
-                "ReferencePoint 2",
-                "ReferencePoint 3"
+                "ReferencePoints (x:y)"
     ]
     filename = filename.split(".")[0] + "-Floors.csv"
     csv_path = os.path.join(filepath, filename)
@@ -133,7 +131,7 @@ def save_csv_floors(floors, filepath, filename):
             floor_count = 0
             for floor in floors:
                 floor_count += 1
-                row = [floor.name, floor.image, floor.width, floor.height, floor.scaling]
+                row = [floor.name, floor.image, floor.width, floor.height, floor.scaling, floor.points]
                 csvwriter.writerow(row)
     except PermissionError:
         no()
