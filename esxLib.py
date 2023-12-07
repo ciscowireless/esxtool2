@@ -28,6 +28,7 @@ all_floors = []
 def read_esx(json_path):
 
     read_floors_plans(json_path)
+    read_reference_points(json_path)
     read_access_points(json_path)
     read_simulated_radios(json_path)
     read_antenna_types(json_path)
@@ -51,6 +52,18 @@ def read_floors_plans(json_path):
         floor.scaling = item["metersPerUnit"]
 
         all_floors.append(floor)
+
+
+def read_reference_points(json_path):
+
+    try:
+        with open(os.path.join(json_path, "referencePoints.json"), "r") as f:
+            reference_points = json.load(f)
+    except FileNotFoundError:
+        info()
+        print(f"Not found: {colorama.Fore.YELLOW}referencePoints.json{colorama.Fore.RESET}")
+    else:
+        pass
 
 
 def read_access_points(json_path):

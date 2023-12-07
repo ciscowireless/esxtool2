@@ -119,7 +119,10 @@ def save_csv_floors(floors, filepath, filename):
                 "ImageId",
                 "Width",
                 "Height",
-                "Scaling (m/unit)"
+                "Scaling (m/unit)",
+                "ReferencePoint 1",
+                "ReferencePoint 2",
+                "ReferencePoint 3"
     ]
     filename = filename.split(".")[0] + "-Floors.csv"
     csv_path = os.path.join(filepath, filename)
