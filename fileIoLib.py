@@ -81,6 +81,7 @@ def save_csv_aps(aps, filepath, filename):
                     "TxPower",
                     "Height",
                     "Tilt",
+                    "Direction",
                     "Antenna"
     ]
     headings += 4 * slot_headings #Add CSV columns for up to 4 radio slots
@@ -102,6 +103,7 @@ def save_csv_aps(aps, filepath, filename):
                     row.append(ap.slots[slot]["txpower"])
                     row.append(ap.slots[slot]["antennaheight"])
                     row.append(ap.slots[slot]["antennatilt"])
+                    row.append(ap.slots[slot]["antennadirection"])
                     row.append(ap.slots[slot]["antennatype"])
                 csvwriter.writerow(row)
     except PermissionError:

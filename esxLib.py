@@ -127,7 +127,7 @@ def read_simulated_radios(json_path):
                         slot_config[item["accessPointIndex"]] = {}
                         try:
                             slot_config[item["accessPointIndex"]]["channel"] = freq_to_channel(item["channelByCenterFrequencyDefinedNarrowChannels"][0])
-                        except IndexError:
+                        except (KeyError, IndexError):
                             slot_config[item["accessPointIndex"]]["channel"] = 0
                             info()
                             print("Simulated radio does not have channel, setting to 0")
@@ -135,7 +135,7 @@ def read_simulated_radios(json_path):
                         slot_config[item["accessPointIndex"]]["antennamounting"] = item["antennaMounting"]
                         slot_config[item["accessPointIndex"]]["antennaheight"] = round(item["antennaHeight"], 1)
                         slot_config[item["accessPointIndex"]]["antennatilt"] = round(item["antennaTilt"])
-                        slot_config[item["accessPointIndex"]]["antennadirection"] = item["antennaDirection"]
+                        slot_config[item["accessPointIndex"]]["antennadirection"] = round(item["antennaDirection"])
                         slot_config[item["accessPointIndex"]]["enabled"] = item["enabled"]
                         if item["enabled"]:
                             slot_config[item["accessPointIndex"]]["txpower"] = round(item["transmitPower"])
