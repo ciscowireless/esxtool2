@@ -21,24 +21,23 @@ class Floor():
         self.id = id
 
 
-all_aps = []
-all_floors = []
+def read_esx_aps(esx_aps, esx_floors, json_path):
+
+    read_access_points(esx_aps, esx_floors, json_path)
+    read_simulated_radios(esx_aps, json_path)
+    read_antenna_types(esx_aps, json_path)
+    read_measured_radios(esx_aps, json_path)
+    read_access_point_measurements(esx_aps, json_path)
 
 
-def read_esx(json_path):
+def read_esx_floors(esx_floors, json_path):
 
-    read_floors_plans(json_path)
-    read_reference_points(json_path)
-    read_access_points(json_path)
-    read_simulated_radios(json_path)
-    read_antenna_types(json_path)
-    read_measured_radios(json_path)
-    read_access_point_measurements(json_path)
+    read_floors_plans(esx_floors, json_path)
+    read_reference_points(esx_floors, json_path)
     
-    return all_aps, all_floors
 
 
-def read_floors_plans(json_path):
+def read_floors_plans(esx_floors, json_path):
 
     with open(os.path.join(json_path, "floorPlans.json"), "r") as f:
         floors = json.load(f)
@@ -50,12 +49,12 @@ def read_floors_plans(json_path):
         floor.height = item["height"]
         floor.image = item["imageId"]
         floor.scaling = item["metersPerUnit"]
-        floor.points = ""
+        floor.points = []
 
-        all_floors.append(floor)
+        esx_floors.append(floor)
 
 
-def read_reference_points(json_path):
+def read_reference_points(esx_floors, json_path):
 
     try:
         with open(os.path.join(json_path, "referencePoints.json"), "r") as f:
@@ -66,50 +65,54 @@ def read_reference_points(json_path):
     else:
         for reference in reference_points["referencePoints"]:
             for point in reference["projections"]:
-                x = round(float(point["coord"]["x"]), 1)
-                y = round(float(point["coord"]["y"]), 1)
-                floor_index = next((index for index, floor in enumerate(all_floors) if floor.id == point["floorPlanId"]), None)
-                all_floors[floor_index].points += f"({x}:{y})" 
+                x = round(point["coord"]["x"])
+                y = round(point["coord"]["y"])
+                floor_index = next((index for index, floor in enumerate(esx_floors) if floor.id == point["floorPlanId"]), None)
+                esx_floors[floor_index].points.append([x,y])
 
 
-def read_access_points(json_path):
+def read_access_points(esx_aps, esx_floors, json_path):
 
-    with open(os.path.join(json_path, "accessPoints.json"), "r") as f:
-        access_points = json.load(f)
-
-    for item in access_points["accessPoints"]:
-        if item["status"] != "DELETED":
-            ap = Ap(item["id"])
-            ap.name = item["name"]
-            ap.mac = ""
-            ap.ssid = ""
-            try:
-                ap.vendor = item["vendor"]
-            except KeyError:
-                ap.vendor = ""
-            try:
-                ap.model = item["model"]
-            except KeyError:
-                ap.model = ""
-            try:
-                ap.location_x = round(item["location"]["coord"]["x"])
-            except KeyError:
-                ap.location_x = ""
-            try:
-                ap.location_y = round(item["location"]["coord"]["y"])
-            except KeyError:
-                ap.location_y = ""
-            try:
-                ap.location_id = item["location"]["floorPlanId"]
-                ap.location_name = next(floor.name for floor in all_floors if floor.id == ap.location_id)
-            except KeyError:
-                ap.location_id = ""
-                ap.location_name = ""
+    try:
+        with open(os.path.join(json_path, "accessPoints.json"), "r") as f:
+            access_points = json.load(f)
+    except FileNotFoundError:
+        info()
+        print(f"Not found: {colorama.Fore.YELLOW}accessPoints.json{colorama.Fore.RESET}")
+    else:
+        for item in access_points["accessPoints"]:
+            if item["status"] != "DELETED":
+                ap = Ap(item["id"])
+                ap.name = item["name"]
+                ap.mac = ""
+                ap.ssid = ""
+                try:
+                    ap.vendor = item["vendor"]
+                except KeyError:
+                    ap.vendor = ""
+                try:
+                    ap.model = item["model"]
+                except KeyError:
+                    ap.model = ""
+                try:
+                    ap.location_x = round(item["location"]["coord"]["x"])
+                except KeyError:
+                    ap.location_x = ""
+                try:
+                    ap.location_y = round(item["location"]["coord"]["y"])
+                except KeyError:
+                    ap.location_y = ""
+                try:
+                    ap.location_id = item["location"]["floorPlanId"]
+                    ap.location_name = next(floor.name for floor in esx_floors if floor.id == ap.location_id)
+                except KeyError:
+                    ap.location_id = ""
+                    ap.location_name = ""
             
-            all_aps.append(ap)
+                esx_aps.append(ap)
 
 
-def read_simulated_radios(json_path):
+def read_simulated_radios(esx_aps, json_path):
 
     try:
         with open(os.path.join(json_path, "simulatedRadios.json"), "r") as f:
@@ -119,7 +122,7 @@ def read_simulated_radios(json_path):
         print(f"Not found: {colorama.Fore.YELLOW}simulatedRadios.json{colorama.Fore.RESET}")
     else:
         for item in radios["simulatedRadios"]:
-            for ap in all_aps:
+            for ap in esx_aps:
                 if ap.id == item["accessPointId"]:
                     ap.ekahau = "Simulated"
                     if item["radioTechnology"] != "BLUETOOTH": #Exclude Bluetooth radios
@@ -145,7 +148,7 @@ def read_simulated_radios(json_path):
                         ap.slots = {**ap.slots, **slot_config}
 
 
-def read_antenna_types(json_path):
+def read_antenna_types(esx_aps, json_path):
 
     try:
         with open(os.path.join(json_path, "antennaTypes.json"), "r") as f:
@@ -154,7 +157,7 @@ def read_antenna_types(json_path):
         info()
         print(f"Not found: {colorama.Fore.YELLOW}antennaTypes.json{colorama.Fore.RESET}")
     else:
-        for ap in all_aps:
+        for ap in esx_aps:
             for slot, config in ap.slots.items():
                 try:
                     ap.slots[slot]["antennatype"] = next((item["name"] for item in antennas["antennaTypes"] if item["id"] == config["antennaid"]), "NA")
@@ -174,7 +177,7 @@ def freq_to_channel(freq):
         pass
 
 
-def read_measured_radios(json_path):
+def read_measured_radios(esx_aps, json_path):
 
     try:
         with open(os.path.join(json_path, "measuredRadios.json"), "r") as f:
@@ -184,12 +187,12 @@ def read_measured_radios(json_path):
         print(f"Not found: {colorama.Fore.YELLOW}measuredRadios.json{colorama.Fore.RESET}")
     else:
         for radio in measured["measuredRadios"]:
-            for ap in all_aps:
+            for ap in esx_aps:
                 if radio["accessPointId"] == ap.id:
                     ap.measuredradio = radio["accessPointMeasurementIds"][0] #Save first found measurement id
 
 
-def read_access_point_measurements(json_path):
+def read_access_point_measurements(esx_aps, json_path):
 
     try:
         with open(os.path.join(json_path, "accessPointMeasurements.json"), "r") as f:
@@ -199,7 +202,7 @@ def read_access_point_measurements(json_path):
         print(f"Not found: {colorama.Fore.YELLOW}accessPointMeasurements.json{colorama.Fore.RESET}")
     else:
         for measurement in measurements["accessPointMeasurements"]:
-            for ap in all_aps:
+            for ap in esx_aps:
                 if measurement["id"] == ap.measuredradio:
                     ap.ssid = measurement["ssid"]
                     ap.mac = measurement["mac"]

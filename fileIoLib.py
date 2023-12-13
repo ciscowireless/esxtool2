@@ -29,7 +29,7 @@ def make_empty_csv():
 
 def unzip_esx(esx_file):
 
-    extract_dir = os.path.join(os.path.dirname(esx_file), "esxtool-temp")
+    extract_dir = os.path.join(os.path.dirname(esx_file), f"{esx_file}-extract")
     try:
         os.mkdir(extract_dir)
     except FileExistsError:
