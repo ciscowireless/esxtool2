@@ -22,8 +22,6 @@ Floorplans must have the same name within Ekahau, supports multiple floorplan re
 
 Both .esx files need TWO matching floor alignment points for each floorplan
 
-Map scaling is not required
-
 Re-aligns all APs based on coordinates calculated from alignment points
 
 Floor alignment poins are consumed (deleted) during the process
