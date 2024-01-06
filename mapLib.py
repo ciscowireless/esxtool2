@@ -13,6 +13,10 @@ def rescale_maps(floors, map_floors, aps, old_esx_path, new_esx_path):
     for floor in floors:
         if floor.name in [m.name for m in map_floors]:
             update_maps[floor.name] = {}
+    
+    if len(update_maps) == 0:
+        info()
+        print(f"No matching floorplans{colorama.Fore.RESET}")
 
     for update_map in update_maps.keys():
         old_floor_index = next(index for index, floor in enumerate(floors) if floor.name == update_map)
@@ -95,7 +99,10 @@ def rescale_maps(floors, map_floors, aps, old_esx_path, new_esx_path):
         shutil.copy(os.path.join(new_esx_path, f'image-{map_data["new_image"]}'), 
                     os.path.join(old_esx_path, f'image-{map_data["old_image"]}'))
     
-    #Debug
+    ok()
+    print(f"Replaced images: {colorama.Fore.GREEN}{len(update_maps)}{colorama.Fore.RESET}")
+    ok()
+    print(f"Repositioned APs: {colorama.Fore.GREEN}{len(update_aps)}{colorama.Fore.RESET}")
     #print(json.dumps(update_aps, indent=4))
     #print(json.dumps(update_maps, indent=4))
 

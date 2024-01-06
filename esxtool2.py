@@ -6,6 +6,8 @@ Example use case: Normalize ESX contents (e.g. AP Names) prior to DNA-C map uplo
 
 Verified on Ekahau AI Pro 11.4 / 11.5
 
+Added image swap function, replaces & rescales map from 2nd ESX file, based on alignment points
+
 """
 import os
 import argparse
@@ -65,7 +67,6 @@ def run(EsxTool):
         remove_temp(EsxTool.temp_path)
         remove_temp(EsxTool.map_temp_path)
 
-        
 
 def path_init_esx(esx_path):
 
