@@ -50,7 +50,7 @@ def run(EsxTool):
         remove_temp(EsxTool.temp_path)
 
     elif args.fromcsv:
-        path_init_esx(args.fromcsv[0])
+        EsxTool.esx_dir, EsxTool.esx_file, EsxTool.temp_path = path_init_esx(args.fromcsv[0])
         EsxTool.csv_data = read_csv(args.fromcsv[1])
         write_esx(EsxTool.csv_data, EsxTool.temp_path)
         zip_esx(EsxTool.temp_path, EsxTool.esx_dir, EsxTool.esx_file)

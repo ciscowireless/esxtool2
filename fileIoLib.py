@@ -162,7 +162,7 @@ def read_csv(csv_path):
                 noxy_count += 1
                 newx, newy = "", ""
 
-            csv_data.append({"apname" : apname, "newname": newname, "newx": newx, "newy": newy})    
+            csv_data.append({"apname" : apname, "newname": newname, "newx": newx, "newy": newy})
     ok()
     print(f"Read {colorama.Fore.GREEN}{count}{colorama.Fore.RESET} AP(s) from CSV")
     return csv_data
@@ -182,13 +182,13 @@ def write_esx(csv_data, json_path):
                 name_count += 1
                 ap_json["accessPoints"][ap_json["accessPoints"].index(ap)].update({"name": new_name})
         
-        if ap.get("location"):
-            newx = csv_data[index]["newx"]
-            newy = csv_data[index]["newy"]
-            if newx != "" and newy != "":
-                coord_count += 1
-                ap_json["accessPoints"][ap_json["accessPoints"].index(ap)]["location"]["coord"].update({"x": newx})
-                ap_json["accessPoints"][ap_json["accessPoints"].index(ap)]["location"]["coord"].update({"y": newy})
+            if ap.get("location"):
+                newx = csv_data[index]["newx"]
+                newy = csv_data[index]["newy"]
+                if newx != "" and newy != "":
+                    coord_count += 1
+                    ap_json["accessPoints"][ap_json["accessPoints"].index(ap)]["location"]["coord"].update({"x": newx})
+                    ap_json["accessPoints"][ap_json["accessPoints"].index(ap)]["location"]["coord"].update({"y": newy})
 
     with open(os.path.join(json_path, "accessPoints.json"), "w") as f:
         json.dump(ap_json, f, indent=2)
