@@ -70,6 +70,7 @@ def save_csv_aps(aps, filepath, filename):
                 "Floor X",
                 "Floor Y",
                 "Ekahau AP Type",
+                "Hidden",
                 "Model",
                 "MAC Address",
                 "SSID"
@@ -95,7 +96,7 @@ def save_csv_aps(aps, filepath, filename):
             ap_count = 0
             for ap in aps:
                 ap_count += 1
-                row = [ap.name, ap.location_name, ap.location_x, ap.location_y, ap.ekahau, ap.model, ap.mac, ap.ssid]
+                row = [ap.name, ap.location_name, ap.location_x, ap.location_y, ap.ekahau, ap.hidden, ap.model, ap.mac, ap.ssid]
                 for slot in sorted(ap.slots):
                     row.append(slot)
                     row.append(ap.slots[slot]["enabled"])

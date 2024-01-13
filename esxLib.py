@@ -84,6 +84,7 @@ def read_access_points(esx_aps, esx_floors, json_path):
             if item["status"] != "DELETED":
                 ap = Ap(item["id"])
                 ap.name = item["name"]
+                ap.hidden = item["hidden"]
                 ap.mac = ""
                 ap.ssid = ""
                 try:
