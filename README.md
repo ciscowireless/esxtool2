@@ -3,7 +3,7 @@ Command line tool for manipulating contents of Ekahau .esx files
 
 Extracts ESX information to CSV / Updates ESX from CSV
 
-Swaps images between Ekahau files - update images with diferent sizes and rescale based on alignment points.
+Swaps images between Ekahau files - update images with different sizes and rescale based on alignment points.
 
 Example use case: Normalize ESX contents (e.g. AP Names) prior to DNA-C map upload
 
@@ -18,13 +18,13 @@ Replaces image from _new_ esx file into _project_ esx file (creates new esx file
 
 Images can be of different resolution
 
-Floorplans must have the same name within Ekahau, supports multiple floorplan replacement simultaeously
+Floorplans must have the same name within Ekahau, supports multiple floorplan replacement simultaneously
 
 Both .esx files need TWO matching floor alignment points for each floorplan
 
 Re-aligns all APs based on coordinates calculated from alignment points
 
-Floor alignment poins are consumed (deleted) during the process
+Floor alignment points are consumed (deleted) during the process
 
 #### --tocsv [.esx file]
 
