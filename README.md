@@ -1,9 +1,9 @@
 ## ESX Tool v2
 Command line tool for manipulating contents of Ekahau .esx files
 
-Extracts ESX information to CSV / Updates ESX from CSV
+- Extracts ESX information to CSV / Updates ESX from CSV
 
-Swaps images between Ekahau files - update images with different sizes and rescale based on alignment points.
+- Swaps images between Ekahau files - update images with different sizes and rescale based on alignment points.
 
 Example use case: Normalize ESX contents (e.g. AP Names) prior to DNA-C map upload
 
