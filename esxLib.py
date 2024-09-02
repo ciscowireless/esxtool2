@@ -205,7 +205,10 @@ def read_access_point_measurements(esx_aps, json_path):
         for measurement in measurements["accessPointMeasurements"]:
             for ap in esx_aps:
                 if measurement["id"] == ap.measuredradio:
-                    ap.ssid = measurement["ssid"]
+                    try:
+                        ap.ssid = measurement["ssid"]
+                    except KeyError:
+                        ap.ssid = "" #Replace with blank SSID if measurement has no SSID
                     ap.mac = measurement["mac"]
                     ap.ekahau = "Measured"
 

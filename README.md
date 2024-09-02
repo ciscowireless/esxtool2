@@ -8,7 +8,7 @@ Command line tool for manipulating contents of Ekahau .esx files
 Example use case: Normalize ESX contents (e.g. AP Names) prior to DNA-C map upload
 
 
-Verified on Ekahau AI Pro 11.4.0.1
+Tested on Ekahau AI Pro 11.4.0.1, 11.6.2.1
 
 ### Command line options
 
