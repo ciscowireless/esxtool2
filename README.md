@@ -28,7 +28,7 @@ Step-by-step:
 - In project ESX file, add **two** alignment points on the map
 - Create a separate ESX file with only a new map image - image size can be different to project ESX, but the map should be depicting the same area
 - Add **two** matching reference points to the map ESX file
-- ESXTool will create a third ESX file, with the APs from the project file repositioned onto the image from the new map file
+- ESXTool will create a third ESX file, with the APs from the project file repositioned onto the image from the map file
 - Map names must match in Ekahau
 
 #### --tocsv
