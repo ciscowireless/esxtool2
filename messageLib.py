@@ -1,13 +1,10 @@
 import colorama
 
 
-def ok():
-    print(f"[ {colorama.Fore.GREEN}  OK  {colorama.Fore.RESET} ]  ", end = "")
+class Status():
 
+    def __init__(self):
 
-def info():
-    print(f"[ {colorama.Fore.YELLOW} INFO {colorama.Fore.RESET} ]  ", end = "")
-
-
-def no():
-    print(f"[ {colorama.Fore.RED}  NO  {colorama.Fore.RESET} ]  ", end = "")
+        self.ok = f"[ {colorama.Fore.GREEN}  OK  {colorama.Fore.RESET} ]  "
+        self.no = f"[ {colorama.Fore.RED}  NO  {colorama.Fore.RESET} ]  "
+        self.info = f"[ {colorama.Fore.YELLOW} INFO {colorama.Fore.RESET} ]  "

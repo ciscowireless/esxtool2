@@ -1,85 +1,27 @@
 """
-ESX Tool v2
+ESX Tool v2.1
 Command line tool for manipulating contents of Ekahau .ESX files
-Extracts ESX information into CSV / Updates ESX from CSV
-Example use case: Normalize ESX contents (e.g. AP Names) prior to DNA-C map upload
 
-Verified on Ekahau AI Pro 11.4 / 11.5
+Example use case(s): 
+- Extract static AP radio configuration into CSV for conversion into WLC CLI
+- Normalize ESX contents (e.g. AP naming convention) prior to Catalyst Center map upload
+- Swap Ekahau map images - update images with different sizes and reposition APs based on alignment points
 
-Added image swap function, replaces & rescales map from 2nd ESX file, based on alignment points
+Tested on Ekahau AI Pro 11.4 / 11.5 / 11.6
 
+This software is licensed under the Cisco Sample Code License
+
+https://github.com/ciscowireless/esxtool2
 """
 import os
 import argparse
 
 import colorama
 
-from messageLib import *
-from fileIoLib import *
-from esxLib import *
-from mapLib import *
-
-
-def file_path(file_path):
-
-    if not os.path.isfile(file_path):
-        raise ValueError()
-    else:
-        return file_path
-
-
-def run(EsxTool):
-
-    parser = argparse.ArgumentParser(description=f"\n{colorama.Fore.CYAN}ESX Tool{colorama.Fore.RESET} Version 2 - ESX file manipuilation tool")
-    parser_group = parser.add_mutually_exclusive_group(required=True)
-    parser_group.add_argument("--tocsv", help="Specify ESX file", type=file_path, metavar="ESX")
-    parser_group.add_argument("--fromcsv", help="Specify ESX file and CSV file", nargs=2, type=file_path, metavar=('ESX', 'CSV'))  
-    parser_group.add_argument("--template", help="Generate empty CSV template", action="store_true")
-    parser_group.add_argument("--mapreplace", help="Replace & rescale ESX map from new ESX", nargs=2, type=file_path, metavar=("ESX", "Map-ESX"))
-    args = parser.parse_args()
-
-    if args.template:
-        make_empty_csv()
-
-    elif args.tocsv:
-        EsxTool.esx_dir, EsxTool.esx_file, EsxTool.temp_path = path_init_esx([args.tocsv][0])
-        read_esx_floors(EsxTool.floors, EsxTool.temp_path)
-        read_esx_aps(EsxTool.aps, EsxTool.floors, EsxTool.temp_path)
-        save_csv_aps(EsxTool.aps, EsxTool.esx_dir, EsxTool.esx_file)
-        save_csv_floors(EsxTool.floors, EsxTool.esx_dir, EsxTool.esx_file)
-        remove_temp(EsxTool.temp_path)
-
-    elif args.fromcsv:
-        EsxTool.esx_dir, EsxTool.esx_file, EsxTool.temp_path = path_init_esx(args.fromcsv[0])
-        EsxTool.csv_data = read_csv(args.fromcsv[1])
-        write_esx(EsxTool.csv_data, EsxTool.temp_path)
-        zip_esx(EsxTool.temp_path, EsxTool.esx_dir, EsxTool.esx_file)
-        remove_temp(EsxTool.temp_path)
-    
-    elif args.mapreplace:
-        EsxTool.esx_dir, EsxTool.esx_file, EsxTool.temp_path = path_init_esx(args.mapreplace[0])
-        EsxTool.map_esx_dir, EsxTool.map_esx_file, EsxTool.map_temp_path = path_init_esx(args.mapreplace[1])
-        read_esx_floors(EsxTool.floors, EsxTool.temp_path)
-        read_esx_floors(EsxTool.map_floors, EsxTool.map_temp_path)
-        read_esx_aps(EsxTool.aps, EsxTool.floors, EsxTool.temp_path)
-        rescale_maps(EsxTool.floors, EsxTool.map_floors, EsxTool.aps, EsxTool.temp_path, EsxTool.map_temp_path)
-        zip_esx(EsxTool.temp_path, EsxTool.esx_dir, EsxTool.esx_file)
-        remove_temp(EsxTool.temp_path)
-        remove_temp(EsxTool.map_temp_path)
-
-
-def path_init_esx(esx_path):
-
-    full_esx_path = os.path.abspath(esx_path)
-    esx_dir = os.path.dirname(full_esx_path)
-    esx_file = os.path.basename(full_esx_path)
-    ok()
-    print(f"ESX file: {colorama.Fore.GREEN}{esx_file}{colorama.Fore.RESET}")
-    ok()
-    print(f"ESX location: {colorama.Fore.GREEN}{esx_dir}{colorama.Fore.RESET}")
-    temp_path = unzip_esx(full_esx_path)
-
-    return esx_dir, esx_file, temp_path
+from messageLib import Status
+from fileIoLib import FileIo
+from esxLib import Esx
+from mapLib import Maps
 
 
 class EsxTool2():
@@ -91,8 +33,81 @@ class EsxTool2():
         self.aps = []
         self.floors = []
         self.map_floors = []
+
+        self.map_match = True
     
-        run(self)
+        self.status = Status()
+        self.file_io = FileIo()
+        self.esx = Esx()
+        self.maps = Maps()
+
+        self.run()
+
+
+    def path_init_esx(self, file_path, path_type):
+
+        full_path = os.path.abspath(file_path)
+        match path_type:
+            case "ESX":
+                self.esx_file = os.path.basename(full_path)
+                self.esx_dir = os.path.dirname(full_path)
+                print(f"{self.status.ok}ESX file: {colorama.Fore.GREEN}{self.esx_file}{colorama.Fore.RESET}")
+                print(f"{self.status.ok}ESX location: {colorama.Fore.GREEN}{self.esx_dir}{colorama.Fore.RESET}")
+                self.temp_path = self.file_io.unzip_esx(full_path)
+            case "MAP":
+                self.map_esx_file = os.path.basename(full_path)
+                self.map_esx_dir = os.path.dirname(full_path)
+                print(f"{self.status.ok}MAP file: {colorama.Fore.GREEN}{self.map_esx_file}{colorama.Fore.RESET}")
+                print(f"{self.status.ok}MAP location: {colorama.Fore.GREEN}{self.map_esx_dir}{colorama.Fore.RESET}")
+                self.map_temp_path = self.file_io.unzip_esx(full_path)
+
+    
+    def file_path(self, file_path):
+
+        if not os.path.isfile(file_path):
+            raise ValueError()
+        else:
+            return file_path
+
+
+    def run(self):
+
+        parser = argparse.ArgumentParser(description=f"\n{colorama.Fore.CYAN}ESX Tool{colorama.Fore.RESET} Version 2.1 - ESX file manipuilation tool")
+        parser_group = parser.add_mutually_exclusive_group(required=True)
+        parser_group.add_argument("--tocsv", help="Specify ESX file", type=self.file_path, metavar="ESX")
+        parser_group.add_argument("--fromcsv", help="Specify ESX file and CSV file", nargs=2, type=self.file_path, metavar=('ESX', 'CSV'))  
+        parser_group.add_argument("--template", help="Generate empty CSV template", action="store_true")
+        parser_group.add_argument("--mapreplace", help="Replace & rescale ESX map from new ESX", nargs=2, type=self.file_path, metavar=("ESX", "Map-ESX"))
+        args = parser.parse_args()
+
+        if args.template:
+            self.file_io.make_empty_csv()
+
+        elif args.tocsv:
+            self.path_init_esx([args.tocsv][0], "ESX")
+            self.esx.read_esx_floors(self.floors, self.temp_path)
+            self.esx.read_esx_aps(self.aps, self.floors, self.temp_path)
+            self.file_io.save_csv_aps(self.aps, self.esx_dir, self.esx_file)
+            self.file_io.save_csv_floors(self.floors, self.esx_dir, self.esx_file)
+            self.file_io.remove_temp(self.temp_path)
+
+        elif args.fromcsv:
+            self.path_init_esx(args.fromcsv[0], "ESX")
+            self.csv_data = self.file_io.read_csv(args.fromcsv[1])
+            self.file_io.write_esx(self.csv_data, self.temp_path)
+            self.file_io.zip_esx(self.temp_path, self.esx_dir, self.esx_file)
+            self.file_io.remove_temp(self.temp_path)
+        
+        elif args.mapreplace:
+            self.path_init_esx(args.mapreplace[0], "ESX")
+            self.path_init_esx(args.mapreplace[1], "MAP")
+            self.esx.read_esx_floors(self.floors, self.temp_path)
+            self.esx.read_esx_floors(self.map_floors, self.map_temp_path)
+            self.esx.read_esx_aps(self.aps, self.floors, self.temp_path)
+            self.maps.rescale_maps(self.floors, self.map_floors, self.aps, self.temp_path, self.map_temp_path)
+            if self.maps.map_match: self.file_io.zip_esx(self.temp_path, self.esx_dir, self.esx_file)
+            self.file_io.remove_temp(self.temp_path)
+            self.file_io.remove_temp(self.map_temp_path)
 
 
 if __name__ == "__main__":

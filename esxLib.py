@@ -3,7 +3,8 @@ import json
 
 import colorama
 
-from messageLib import *
+from messageLib import Status
+status = Status()
 
 
 class Ap():
@@ -21,21 +22,28 @@ class Floor():
         self.id = id
 
 
-def read_esx_aps(esx_aps, esx_floors, json_path):
-
-    read_access_points(esx_aps, esx_floors, json_path)
-    read_simulated_radios(esx_aps, json_path)
-    read_antenna_types(esx_aps, json_path)
-    read_measured_radios(esx_aps, json_path)
-    read_access_point_measurements(esx_aps, json_path)
+class Esx():
 
 
-def read_esx_floors(esx_floors, json_path):
+    def __init__(self):
 
-    read_floors_plans(esx_floors, json_path)
-    read_reference_points(esx_floors, json_path)
+        self.status = Status()
+
+
+    def read_esx_aps(self, esx_aps, esx_floors, json_path):
+
+        read_access_points(esx_aps, esx_floors, json_path)
+        read_simulated_radios(esx_aps, json_path)
+        read_antenna_types(esx_aps, json_path)
+        read_measured_radios(esx_aps, json_path)
+        read_access_point_measurements(esx_aps, json_path)
+
+
+    def read_esx_floors(self, esx_floors, json_path):
+
+        read_floors_plans(esx_floors, json_path)
+        read_reference_points(esx_floors, json_path)
     
-
 
 def read_floors_plans(esx_floors, json_path):
 
@@ -59,9 +67,9 @@ def read_reference_points(esx_floors, json_path):
     try:
         with open(os.path.join(json_path, "referencePoints.json"), "r") as f:
             reference_points = json.load(f)
+
     except FileNotFoundError:
-        info()
-        print(f"Not found: {colorama.Fore.YELLOW}referencePoints.json{colorama.Fore.RESET}")
+        print(f"{status.info}Not found: {colorama.Fore.YELLOW}referencePoints.json{colorama.Fore.RESET}")
     else:
         for reference in reference_points["referencePoints"]:
             for point in reference["projections"]:
@@ -76,9 +84,9 @@ def read_access_points(esx_aps, esx_floors, json_path):
     try:
         with open(os.path.join(json_path, "accessPoints.json"), "r") as f:
             access_points = json.load(f)
+
     except FileNotFoundError:
-        info()
-        print(f"Not found: {colorama.Fore.YELLOW}accessPoints.json{colorama.Fore.RESET}")
+        print(f"{status.info}Not found: {colorama.Fore.YELLOW}accessPoints.json{colorama.Fore.RESET}")
     else:
         for item in access_points["accessPoints"]:
             if item["status"] != "DELETED":
@@ -118,9 +126,9 @@ def read_simulated_radios(esx_aps, json_path):
     try:
         with open(os.path.join(json_path, "simulatedRadios.json"), "r") as f:
             radios = json.load(f)
+
     except FileNotFoundError:
-        info()
-        print(f"Not found: {colorama.Fore.YELLOW}simulatedRadios.json{colorama.Fore.RESET}")
+        print(f"{status.info}Not found: {colorama.Fore.YELLOW}simulatedRadios.json{colorama.Fore.RESET}")
     else:
         for item in radios["simulatedRadios"]:
             for ap in esx_aps:
@@ -133,8 +141,7 @@ def read_simulated_radios(esx_aps, json_path):
                             slot_config[item["accessPointIndex"]]["channel"] = freq_to_channel(item["channelByCenterFrequencyDefinedNarrowChannels"][0])
                         except (KeyError, IndexError):
                             slot_config[item["accessPointIndex"]]["channel"] = 0
-                            info()
-                            print("Simulated radio does not have channel, setting to 0")
+                            print(f"{status.info}Simulated radio does not have channel, setting to 0")
                         slot_config[item["accessPointIndex"]]["antennaid"] = item["antennaTypeId"]
                         slot_config[item["accessPointIndex"]]["antennamounting"] = item["antennaMounting"]
                         slot_config[item["accessPointIndex"]]["antennaheight"] = round(item["antennaHeight"], 1)
@@ -154,9 +161,9 @@ def read_antenna_types(esx_aps, json_path):
     try:
         with open(os.path.join(json_path, "antennaTypes.json"), "r") as f:
             antennas = json.load(f)
+
     except FileNotFoundError:
-        info()
-        print(f"Not found: {colorama.Fore.YELLOW}antennaTypes.json{colorama.Fore.RESET}")
+        print(f"{status.info}Not found: {colorama.Fore.YELLOW}antennaTypes.json{colorama.Fore.RESET}")
     else:
         for ap in esx_aps:
             for slot, config in ap.slots.items():
@@ -164,28 +171,27 @@ def read_antenna_types(esx_aps, json_path):
                     ap.slots[slot]["antennatype"] = next((item["name"] for item in antennas["antennaTypes"] if item["id"] == config["antennaid"]), "NA")
                 except KeyError:
                     ap.slots[slot]["antennatype"] = "NULL"
-                    info()
-                    print("Antenna does not have name, setting to NULL")
+                    print(f"{status.info}Antenna does not have name, setting to NULL")
 
     
 def freq_to_channel(freq):
 
-    if str(freq).startswith("2"):
+    if freq in range(2412, 2485): #2.4GHz
         return int((freq - 2405) / 5)
-    elif str(freq).startswith("5"):
+    elif freq in range(5180, 5886): #5GHz
         return int((freq / 5) - 1000)
-    elif str(freq).startswith(("6", "7")):
-        pass
-
+    elif freq in range(5955, 7116): #6GHz
+        return int(((freq - 5955) / 5) + 1)
+    
 
 def read_measured_radios(esx_aps, json_path):
 
     try:
         with open(os.path.join(json_path, "measuredRadios.json"), "r") as f:
             measured = json.load(f)
+
     except FileNotFoundError:
-        info()
-        print(f"Not found: {colorama.Fore.YELLOW}measuredRadios.json{colorama.Fore.RESET}")
+        print(f"{status.info}Not found: {colorama.Fore.YELLOW}measuredRadios.json{colorama.Fore.RESET}")
     else:
         for radio in measured["measuredRadios"]:
             for ap in esx_aps:
@@ -198,9 +204,9 @@ def read_access_point_measurements(esx_aps, json_path):
     try:
         with open(os.path.join(json_path, "accessPointMeasurements.json"), "r") as f:
             measurements = json.load(f)
+
     except FileNotFoundError:
-        info()
-        print(f"Not found: {colorama.Fore.YELLOW}accessPointMeasurements.json{colorama.Fore.RESET}")
+        print(f"{status.info}Not found: {colorama.Fore.YELLOW}accessPointMeasurements.json{colorama.Fore.RESET}")
     else:
         for measurement in measurements["accessPointMeasurements"]:
             for ap in esx_aps:
