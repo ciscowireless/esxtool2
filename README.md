@@ -23,11 +23,11 @@ esxtool2.py --mapreplace \path-to\project.esx \path-to\map-file.esx
 - Floor alignment points are consumed (deleted) during the process
 
 Step-by-step:
-- In project ESX file, add TWO alignment points on the map
+- In project ESX file, add **two** alignment points on the map
 - Create a separate ESX file with only a new map image - image size can be different to project ESX, but the map should be depicting the same area
-- Add TWO matching reference points to the map ESX file
-- ESXTool will create a third ESX file, with the APs from the project file repositioned on the image from the new map file
-- Map names must match in Ekahau, all matching map names will be rescaled
+- Add **two** matching reference points to the map ESX file
+- ESXTool will create a third ESX file, with the APs from the project file repositioned onto the image from the new map file
+- Map names must match in Ekahau
 
 #### --tocsv
 ```
