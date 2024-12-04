@@ -2,7 +2,7 @@
 ESX Tool v2.1
 Command line tool for manipulating contents of Ekahau .ESX files
 
-Example use case(s): 
+Example use cases: 
 - Extract static AP radio configuration into CSV for conversion into WLC CLI
 - Normalize ESX contents (e.g. AP naming convention) prior to Catalyst Center map upload
 - Swap Ekahau map images - update images with different sizes and reposition APs based on alignment points
