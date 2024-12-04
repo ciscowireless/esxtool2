@@ -41,7 +41,7 @@ esxtool2.py --tocsv \path-to\project.esx
 ```
 esxtool2.py --fromcsv \path-to\project.esx \path-to\template.csv
 ```
-- Ipdates ESX file using data from CSV template
+- Updates ESX file using data from CSV template
 - Changes AP names and X/Y map coordinates
 - Will update AP name if new name is provided
 - Will update X/Y coordinates if new coordinates are provided (only if AP already has coordinates in Ekahau)
