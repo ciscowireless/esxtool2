@@ -9,6 +9,8 @@ Example use cases:
 
 Tested on Ekahau AI Pro 11.4 / 11.5 / 11.6
 
+Python 3.10+
+
 ### Command line options
 
 #### --mapreplace
