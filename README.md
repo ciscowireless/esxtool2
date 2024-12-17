@@ -31,6 +31,11 @@ Step-by-step:
 - ESXTool will create a third ESX file, with the APs from the project file repositioned onto the image from the map file
 - Map names must match in Ekahau
 
+Caveats
+- Will reposition surveyed APs, but not survey paths
+- __Does not__ work on Ekahau projects containing both measured and simulated APs
+- __May not__ work with maps that have been rotated using the Ekahau map rotate feature, rotate the image before importing into Ekahau
+
 #### --tocsv
 ```
 esxtool2.py --tocsv \path-to\project.esx
