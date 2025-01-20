@@ -7,7 +7,7 @@ Example use cases:
 - Normalize ESX contents (e.g. AP naming convention) prior to Catalyst Center map upload
 - Swap Ekahau map images - update images with different sizes and reposition APs based on alignment points
 
-Tested on Ekahau AI Pro 11.4 / 11.5 / 11.6
+Tested on Ekahau AI Pro 11.4 / 11.5 / 11.6 / 11.7
 
 Python 3.10+
 
