@@ -117,6 +117,10 @@ def read_access_points(esx_aps, esx_floors, json_path):
                 except KeyError:
                     ap.location_id = ""
                     ap.location_name = ""
+                try:
+                    ap.colour = item["color"]
+                except KeyError:
+                    ap.colour = ""
             
                 esx_aps.append(ap)
 

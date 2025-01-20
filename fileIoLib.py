@@ -77,6 +77,7 @@ class FileIo():
                     "Floor X",
                     "Floor Y",
                     "Ekahau AP Type",
+                    "Ekahau Colour",
                     "Hidden",
                     "Model",
                     "MAC Address",
@@ -103,7 +104,7 @@ class FileIo():
                 ap_count = 0
                 for ap in aps:
                     ap_count += 1
-                    row = [ap.name, ap.location_name, ap.location_x, ap.location_y, ap.ekahau, ap.hidden, ap.model, ap.mac, ap.ssid]
+                    row = [ap.name, ap.location_name, ap.location_x, ap.location_y, ap.ekahau, ap.colour, ap.hidden, ap.model, ap.mac, ap.ssid]
                     for slot in sorted(ap.slots):
                         row.append(slot)
                         row.append(ap.slots[slot]["enabled"])
