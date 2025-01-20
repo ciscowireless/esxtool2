@@ -1,6 +1,6 @@
 #### Supporting scripts used for Cisco Live
 
-These cripts are part of a larger deployment process, they are crude and of no value on their own.
+These scripts are part of a larger deployment process, they are crude and of no value on their own.
 
 **aprename2025.py**
 
@@ -16,7 +16,7 @@ Renames based on pre-defined AP model, AP height, and map name
 
 Takes ESXTool --tocsv output, as input
 
-Creates WLC CLi for configuring 9104 beamwidths as per Ekahau project
+Creates 9800 CLI for configuring 9104 beamwidths as per Ekahau project
 
 
 
