@@ -19,7 +19,10 @@ all_models = [
             "AP9166I",
             "Catalyst 9166 with Dual 5 GHz",
             "Catalyst 9166",
-            "Catalyst 9166D1"
+            "Catalyst 9166D1",
+            "Catalyst IW9167I",
+            "Wireless CW9176I",
+            "Wireless CW9178I"
             ]
 
 internal_omni = [
@@ -31,7 +34,10 @@ internal_omni = [
             "AP9130I",
             "AP9166I",
             "Catalyst 9166 with Dual 5 GHz",
-            "Catalyst 9166"
+            "Catalyst 9166",
+            "Catalyst IW9167I",
+            "Wireless CW9176I",
+            "Wireless CW9178I"
             ]
 
 internal_directional = [
@@ -99,13 +105,13 @@ csv_data = []
 
 #Column numbers
 OLD_AP_NAME = 0
-MODEL = 6
 FLOOR = 1
-HEIGHT = 13
-ANTENNA_1 = 16
-ANTENNA_2 = 24
-ANTENNA_3 = 32
-ANTENNA_4 = 40
+MODEL = 7
+HEIGHT = 14
+ANTENNA_1 = 17
+ANTENNA_2 = 25
+ANTENNA_3 = 33
+ANTENNA_4 = 41
 
 
 def do_rename(input_file, output_file = "new-names.csv"):
@@ -117,7 +123,11 @@ def do_rename(input_file, output_file = "new-names.csv"):
 
     with open(output_file, 'w', newline='') as output_csv:
         writer = csv.writer(output_csv)
+        row_count = 0
         for row in csv_data:
+            row_count += 1
+            if row_count == 1: continue #Skip 1st row (headings)
+            
             old_ap_name = row[OLD_AP_NAME]
             ap_model = row[MODEL]
             #print(ap_model)
