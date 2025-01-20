@@ -90,11 +90,9 @@ def save_cli(cli_1, cli_2):
 
     with open("wlc-cli.txt", "w") as t:
         t.write("===== RFT commands =====\n\n")
-        for line in cli_1:
-            t.write(line)
+        for line in cli_1: t.write(line)
         t.write("\n\n===== Slot commands =====\n\n")
-        for line in cli_2:
-            t.write(line)
+        for line in cli_2: t.write(line)
     
     print(f"{len(cli_1)} RFT configs\n{len(cli_2)} Slot configs")
 
