@@ -32,7 +32,7 @@ Step-by-step:
 - Map names must match in Ekahau
 
 Caveats
-- Will reposition surveyed APs, but not survey paths
+- Will rescale/reposition APs only, not survey paths, areas, or any other Ekahau objects
 - __Does not__ work on Ekahau projects containing both measured and simulated APs
 - __May not__ work with maps that have been rotated using the Ekahau map rotate feature, rotate the image before importing into Ekahau
 

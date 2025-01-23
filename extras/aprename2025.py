@@ -22,6 +22,7 @@ all_models = [
             "Catalyst 9166D1",
             "Catalyst IW9167I",
             "Wireless CW9176I",
+            "Wireless CW9176D1",
             "Wireless CW9178I"
             ]
 
@@ -42,7 +43,8 @@ internal_omni = [
 
 internal_directional = [
             "AP9124D",
-            "Catalyst 9166D1"
+            "Catalyst 9166D1",
+            "Wireless CW9176D1"
             ]
 
 antennas = {
