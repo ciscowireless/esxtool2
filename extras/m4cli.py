@@ -15,8 +15,10 @@ RF_TAG_MAP = {
 }
 
 SLOT1_ENABLED_ROW = 19
+SLOT1_CHANNEL_ROW = 20
 SLOT1_ANTENNA_ROW = 25
 SLOT2_ENABLED_ROW = 27
+SLOT2_CHANNEL_ROW = 28
 SLOT2_ANTENNA_ROW = 33
 
 def map_ap_mac(text_file):
@@ -38,7 +40,7 @@ def map_ap_mac(text_file):
 
 def generate_cli(csv_file, ap_mac_map):
 
-    cli_1, cli_2 = [], []
+    cli_1, cli_2, cli_3 = [], [], []
     with open(csv_file, "r") as c:
         csv_read = csv.reader(c)
         for row in csv_read:
@@ -46,8 +48,10 @@ def generate_cli(csv_file, ap_mac_map):
             ap_name = row[0]
             #if ap_name in ap_mac_map.keys():
             slot1_enabled = row[SLOT1_ENABLED_ROW].upper()
+            slot1_channel = row[SLOT1_CHANNEL_ROW]
             slot1_antenna = row[SLOT1_ANTENNA_ROW]
             slot2_enabled = row[SLOT2_ENABLED_ROW].upper()
+            slot2_channel = row[SLOT2_CHANNEL_ROW]
             slot2_antenna = row[SLOT2_ANTENNA_ROW]
             slot1_enabled = True if slot1_enabled == "TRUE" else not slot1_enabled
             slot2_enabled = True if slot2_enabled == "TRUE" else not slot2_enabled
@@ -83,23 +87,34 @@ def generate_cli(csv_file, ap_mac_map):
             if not slot1_enabled: cli_2.append(f"ap name {ap_name} slot 1 shutdown \n")
             if not slot2_enabled: cli_2.append(f"ap name {ap_name} slot 2 shutdown \n")
 
-    return cli_1, cli_2
+            cli_3.append(f"ap name {ap_name} slot 1 shutdown \n")
+            cli_3.append(f"ap name {ap_name} dot11 5ghz slot 1 radio role manual client-serving \n")
+            cli_3.append(f"ap name {ap_name} dot11 5ghz slot 1 channel {slot1_channel} \n")
+            cli_3.append(f"ap name {ap_name} no slot 1 shutdown \n")
+            cli_3.append(f"ap name {ap_name} slot 2 shutdown \n")
+            cli_3.append(f"ap name {ap_name} dot11 5ghz slot 2 radio role manual client-serving \n")
+            cli_3.append(f"ap name {ap_name} dot11 5ghz slot 2 channel {slot2_channel} \n")
+            cli_3.append(f"ap name {ap_name} no slot 2 shutdown \n")
+
+    return cli_1, cli_2, cli_3
 
 
-def save_cli(cli_1, cli_2):
+def save_cli(cli_1, cli_2, cli_3):
 
     with open("wlc-cli.txt", "w") as t:
-        t.write("===== RFT commands =====\n\n")
+        t.write("===== RF Tag commands =====\n\n")
         for line in cli_1: t.write(line)
-        t.write("\n\n===== Slot commands =====\n\n")
+        t.write("\n\n===== AP Channel configurations =====\n\n")
+        for line in cli_3: t.write(line)
+        t.write("\n\n===== Disabled AP Slots =====\n\n")
         for line in cli_2: t.write(line)
     
-    print(f"{len(cli_1)} RFT configs\n{len(cli_2)} Slot configs")
+    print(f"{len(cli_1)} RF Tag commands\n{len(cli_3) // 4} AP Slot configs\n{len(cli_2)} Disabled AP Slots")
 
 
 if __name__ == "__main__":
 
     show_ap_summary, esxtool_csv = sys.argv[1], sys.argv[2]
     ap_mac = map_ap_mac(show_ap_summary)
-    cli_1, cli_2 = generate_cli(esxtool_csv, ap_mac)
-    save_cli(cli_1, cli_2)
+    cli_1, cli_2, cli_3 = generate_cli(esxtool_csv, ap_mac)
+    save_cli(cli_1, cli_2, cli_3)
