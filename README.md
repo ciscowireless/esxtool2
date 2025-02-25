@@ -40,7 +40,15 @@ Caveats
 ```
 esxtool2.py --tocsv \path-to\project.esx
 ```
-- Dumps AP information from ESX to CSV
+- Dumps survey information to CSV, from specified ESX file
+- Parses both _Simulated_ and _Measured_ Ekahau files (but not both simultaneously)
+- Saves two CSV files, AP data & map/floor data
+
+#### --alltocsv
+```
+esxtool2.py --alltocsv
+```
+- Dumps survey information to CSV, from all ESX files in current working directory
 - Parses both _Simulated_ and _Measured_ Ekahau files (but not both simultaneously)
 - Saves two CSV files, AP data & map/floor data
 

@@ -66,13 +66,13 @@ class EsxTool2():
                 self.esx_file = os.path.basename(full_path)
                 self.esx_dir = os.path.dirname(full_path)
                 print(f"{self.status.ok}ESX file: {colorama.Fore.GREEN}{self.esx_file}{colorama.Fore.RESET}")
-                print(f"{self.status.ok}ESX location: {colorama.Fore.GREEN}{self.esx_dir}{colorama.Fore.RESET}")
+                #print(f"{self.status.ok}ESX location: {colorama.Fore.GREEN}{self.esx_dir}{colorama.Fore.RESET}")
                 self.temp_path = self.file_io.unzip_esx(full_path)
             case "MAP":
                 self.map_esx_file = os.path.basename(full_path)
                 self.map_esx_dir = os.path.dirname(full_path)
                 print(f"{self.status.ok}MAP file: {colorama.Fore.GREEN}{self.map_esx_file}{colorama.Fore.RESET}")
-                print(f"{self.status.ok}MAP location: {colorama.Fore.GREEN}{self.map_esx_dir}{colorama.Fore.RESET}")
+                #print(f"{self.status.ok}MAP location: {colorama.Fore.GREEN}{self.map_esx_dir}{colorama.Fore.RESET}")
                 self.map_temp_path = self.file_io.unzip_esx(full_path)
 
     
@@ -82,13 +82,23 @@ class EsxTool2():
             raise ValueError()
         else:
             return file_path
+    
+
+    def read_esx(self):
+
+        for esx_file in self.esx_files:
+            self.path_init_esx(esx_file, "ESX")
+            self.esx.read_esx_floors(self.floors, self.temp_path)
+            self.esx.read_esx_aps(self.aps, self.floors, self.temp_path)
+            self.file_io.remove_temp(self.temp_path)
 
 
     def run(self):
 
-        parser = argparse.ArgumentParser(description=f"\n{colorama.Fore.CYAN}ESX Tool{colorama.Fore.RESET} Version 2.1 - ESX file manipuilation tool")
+        parser = argparse.ArgumentParser(description=f"\n{colorama.Fore.CYAN}ESX Tool{colorama.Fore.RESET} Version 2.2 - ESX file manipuilation tool")
         parser_group = parser.add_mutually_exclusive_group(required=True)
         parser_group.add_argument("--tocsv", help="Specify ESX file", type=self.file_path, metavar="ESX")
+        parser_group.add_argument("--alltocsv", help="All ESX files in current directory", action="store_true")
         parser_group.add_argument("--fromcsv", help="Specify ESX file and CSV file", nargs=2, type=self.file_path, metavar=('ESX', 'CSV'))  
         parser_group.add_argument("--template", help="Generate empty CSV template", action="store_true")
         parser_group.add_argument("--mapreplace", help="Replace & rescale ESX map from new ESX", nargs=2, type=self.file_path, metavar=("ESX", "Map-ESX"))
@@ -96,14 +106,20 @@ class EsxTool2():
 
         if args.template:
             self.file_io.make_empty_csv()
+        
+        elif args.alltocsv:
+            self.esx_dir = os.getcwd()
+            self.all_files = os.listdir(os.path.abspath(self.esx_dir))
+            self.esx_files = [file for file in self.all_files if os.path.isfile(file) and file.endswith(".esx")]
+            self.read_esx()
+            self.file_io.save_csv_aps(self.aps, self.esx_dir, "All.")
+            self.file_io.save_csv_floors(self.floors, self.esx_dir, "All.")
 
         elif args.tocsv:
-            self.path_init_esx([args.tocsv][0], "ESX")
-            self.esx.read_esx_floors(self.floors, self.temp_path)
-            self.esx.read_esx_aps(self.aps, self.floors, self.temp_path)
+            self.esx_files = [args.tocsv]
+            self.read_esx()
             self.file_io.save_csv_aps(self.aps, self.esx_dir, self.esx_file)
             self.file_io.save_csv_floors(self.floors, self.esx_dir, self.esx_file)
-            self.file_io.remove_temp(self.temp_path)
 
         elif args.fromcsv:
             self.path_init_esx(args.fromcsv[0], "ESX")

@@ -58,7 +58,7 @@ class FileIo():
         
         with zipfile.ZipFile(esx_file, 'r') as zip:
             zip.extractall(path=self.extract_dir)
-            print(f"{self.status.ok}ESX file extracted to: {colorama.Fore.GREEN}{self.extract_dir}{colorama.Fore.RESET}")
+            #print(f"{self.status.ok}ESX file extracted to: {colorama.Fore.GREEN}{self.extract_dir}{colorama.Fore.RESET}")
 
         return self.extract_dir
 
@@ -66,7 +66,7 @@ class FileIo():
     def remove_temp(self, extracted_esx_path):
 
         shutil.rmtree(extracted_esx_path)
-        print(f"{self.status.ok}Removed temp directory: {colorama.Fore.GREEN}{extracted_esx_path}{colorama.Fore.RESET}")
+        #print(f"{self.status.ok}Removed temp directory: {colorama.Fore.GREEN}{extracted_esx_path}{colorama.Fore.RESET}")
 
 
     def save_csv_aps(self, aps, filepath, filename):
