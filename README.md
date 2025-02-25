@@ -1,4 +1,4 @@
-## ESX Tool v2.1
+## ESX Tool v2.2
 Command line tool for manipulating contents of Ekahau .ESX files
 
 Example use cases:
