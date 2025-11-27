@@ -1,13 +1,11 @@
 """
-ESX Tool v2.1
+ESX Tool v2.2
 Command line tool for manipulating contents of Ekahau .ESX files
 
 Example use cases: 
 - Extract static AP radio configuration into CSV for conversion into WLC CLI
 - Normalize ESX contents (e.g. AP naming convention) prior to Catalyst Center map upload
 - Swap Ekahau map images - update images with different sizes and reposition APs based on alignment points
-
-Tested on Ekahau AI Pro 11.4 / 11.5 / 11.6
 
 https://github.com/ciscowireless/esxtool2
 
@@ -45,8 +43,8 @@ class EsxTool2():
         colorama.init()
 
         self.aps = []
-        self.floors = []
-        self.map_floors = []
+        self.esx_file_floors = []
+        self.map_file_floors = []
 
         self.map_match = True
     
@@ -67,13 +65,13 @@ class EsxTool2():
                 self.esx_dir = os.path.dirname(full_path)
                 print(f"{self.status.ok}ESX file: {colorama.Fore.GREEN}{self.esx_file}{colorama.Fore.RESET}")
                 #print(f"{self.status.ok}ESX location: {colorama.Fore.GREEN}{self.esx_dir}{colorama.Fore.RESET}")
-                self.temp_path = self.file_io.unzip_esx(full_path)
+                self.esx_unzip_path = self.file_io.unzip_esx(full_path)
             case "MAP":
-                self.map_esx_file = os.path.basename(full_path)
-                self.map_esx_dir = os.path.dirname(full_path)
-                print(f"{self.status.ok}MAP file: {colorama.Fore.GREEN}{self.map_esx_file}{colorama.Fore.RESET}")
+                self.map_file = os.path.basename(full_path)
+                self.map_dir = os.path.dirname(full_path)
+                print(f"{self.status.ok}MAP file: {colorama.Fore.GREEN}{self.map_file}{colorama.Fore.RESET}")
                 #print(f"{self.status.ok}MAP location: {colorama.Fore.GREEN}{self.map_esx_dir}{colorama.Fore.RESET}")
-                self.map_temp_path = self.file_io.unzip_esx(full_path)
+                self.map_unzip_path = self.file_io.unzip_esx(full_path)
 
     
     def file_path(self, file_path):
@@ -88,16 +86,16 @@ class EsxTool2():
 
         for esx_file in self.esx_files:
             self.path_init_esx(esx_file, "ESX")
-            self.esx.read_esx_floors(self.floors, self.temp_path)
-            self.esx.read_esx_aps(self.aps, self.floors, self.temp_path)
-            self.file_io.remove_temp(self.temp_path)
+            self.esx.read_esx_floors(self.esx_file_floors, self.esx_unzip_path)
+            self.esx.read_esx_aps(self.aps, self.esx_file_floors, self.esx_unzip_path)
+            self.file_io.remove_temp(self.esx_unzip_path)
 
 
     def run(self):
 
         parser = argparse.ArgumentParser(description=f"\n{colorama.Fore.CYAN}ESX Tool{colorama.Fore.RESET} Version 2.2 - ESX file manipuilation tool")
         parser_group = parser.add_mutually_exclusive_group(required=True)
-        parser_group.add_argument("--tocsv", help="Specify ESX file", type=self.file_path, metavar="ESX")
+        parser_group.add_argument("--esxtocsv", help="Specify ESX file", type=self.file_path, metavar="ESX")
         parser_group.add_argument("--alltocsv", help="All ESX files in current directory", action="store_true")
         parser_group.add_argument("--fromcsv", help="Specify ESX file and CSV file", nargs=2, type=self.file_path, metavar=('ESX', 'CSV'))  
         parser_group.add_argument("--template", help="Generate empty CSV template", action="store_true")
@@ -113,31 +111,31 @@ class EsxTool2():
             self.esx_files = [file for file in self.all_files if os.path.isfile(file) and file.endswith(".esx")]
             self.read_esx()
             self.file_io.save_csv_aps(self.aps, self.esx_dir, "All.")
-            self.file_io.save_csv_floors(self.floors, self.esx_dir, "All.")
+            self.file_io.save_csv_floors(self.esx_file_floors, self.esx_dir, "All.")
 
-        elif args.tocsv:
-            self.esx_files = [args.tocsv]
+        elif args.esxtocsv:
+            self.esx_files = [args.esxtocsv]
             self.read_esx()
             self.file_io.save_csv_aps(self.aps, self.esx_dir, self.esx_file)
-            self.file_io.save_csv_floors(self.floors, self.esx_dir, self.esx_file)
+            self.file_io.save_csv_floors(self.esx_file_floors, self.esx_dir, self.esx_file)
 
         elif args.fromcsv:
             self.path_init_esx(args.fromcsv[0], "ESX")
             self.csv_data = self.file_io.read_csv(args.fromcsv[1])
-            self.file_io.write_esx(self.csv_data, self.temp_path)
-            self.file_io.zip_esx(self.temp_path, self.esx_dir, self.esx_file)
-            self.file_io.remove_temp(self.temp_path)
+            self.file_io.write_esx(self.csv_data, self.esx_unzip_path)
+            self.file_io.zip_esx(self.esx_unzip_path, self.esx_dir, self.esx_file)
+            self.file_io.remove_temp(self.esx_unzip_path)
         
         elif args.mapreplace:
             self.path_init_esx(args.mapreplace[0], "ESX")
             self.path_init_esx(args.mapreplace[1], "MAP")
-            self.esx.read_esx_floors(self.floors, self.temp_path)
-            self.esx.read_esx_floors(self.map_floors, self.map_temp_path)
-            self.esx.read_esx_aps(self.aps, self.floors, self.temp_path)
-            self.maps.rescale_maps(self.floors, self.map_floors, self.aps, self.temp_path, self.map_temp_path)
-            if self.maps.map_match: self.file_io.zip_esx(self.temp_path, self.esx_dir, self.esx_file)
-            self.file_io.remove_temp(self.temp_path)
-            self.file_io.remove_temp(self.map_temp_path)
+            self.esx.read_esx_floors(self.esx_file_floors, self.esx_unzip_path)
+            self.esx.read_esx_floors(self.map_file_floors, self.map_unzip_path)
+            self.esx.read_esx_aps(self.aps, self.esx_file_floors, self.esx_unzip_path)
+            self.maps.rescale_maps(self.esx_file_floors, self.map_file_floors, self.aps, self.esx_unzip_path, self.map_unzip_path)
+            if self.maps.map_match: self.file_io.zip_esx(self.esx_unzip_path, self.esx_dir, self.esx_file)
+            self.file_io.remove_temp(self.esx_unzip_path)
+            self.file_io.remove_temp(self.map_unzip_path)
 
 
 if __name__ == "__main__":

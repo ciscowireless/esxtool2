@@ -7,7 +7,9 @@ Example use cases:
 - Normalize ESX contents (e.g. AP naming convention) prior to Catalyst Center map upload
 - Swap Ekahau map images - update images with different sizes and reposition APs based on alignment points
 
-Tested on Ekahau AI Pro 11.4 / 11.5 / 11.6 / 11.7
+Tested on Ekahau AI Pro 11.4 / 11.5 / 11.6 / 11.7 / 11.8
+
+Note: Ekahau data structures may change over time, support for older Ekahau versions may be broken as newer versions are added
 
 Python 3.10+
 
@@ -35,6 +37,7 @@ Caveats
 - Will rescale/reposition APs only, not survey paths, areas, or any other Ekahau objects
 - __Does not__ work on Ekahau projects containing both measured and simulated APs
 - __May not__ work with maps that have been rotated using the Ekahau map rotate feature, rotate the image before importing into Ekahau
+- __May not__ work when map images are of different types, e.g. replacing a .png with a .pdf, this may be related more to Ekahau itself
 
 #### --tocsv
 ```

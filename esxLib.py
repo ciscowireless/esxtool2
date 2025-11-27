@@ -30,27 +30,27 @@ class Esx():
         self.status = Status()
 
 
-    def read_esx_aps(self, esx_aps, esx_floors, json_path):
+    def read_esx_aps(self, aps, floors, unzip_path):
 
-        read_access_points(esx_aps, esx_floors, json_path)
-        read_simulated_radios(esx_aps, json_path)
-        read_antenna_types(esx_aps, json_path)
-        read_measured_radios(esx_aps, json_path)
-        read_access_point_measurements(esx_aps, json_path)
+        read_access_points(aps, floors, unzip_path)
+        read_simulated_radios(aps, unzip_path)
+        read_antenna_types(aps, unzip_path)
+        read_measured_radios(aps, unzip_path)
+        read_access_point_measurements(aps, unzip_path)
 
 
-    def read_esx_floors(self, esx_floors, json_path):
+    def read_esx_floors(self, floors, unzip_path):
 
-        read_floors_plans(esx_floors, json_path)
-        read_reference_points(esx_floors, json_path)
+        read_floors_plans(floors, unzip_path)
+        read_reference_points(floors, unzip_path)
     
 
-def read_floors_plans(esx_floors, json_path):
+def read_floors_plans(floors, json_path):
 
     with open(os.path.join(json_path, "floorPlans.json"), "r") as f:
-        floors = json.load(f)
+        esx_floors = json.load(f)
 
-    for item in floors["floorPlans"]:
+    for item in esx_floors["floorPlans"]:
         floor = Floor(item["id"])
         floor.name = item["name"]
         floor.width = item["width"]
@@ -59,10 +59,10 @@ def read_floors_plans(esx_floors, json_path):
         floor.scaling = item["metersPerUnit"]
         floor.points = []
 
-        esx_floors.append(floor)
+        floors.append(floor)
 
 
-def read_reference_points(esx_floors, json_path):
+def read_reference_points(floors, json_path):
 
     try:
         with open(os.path.join(json_path, "referencePoints.json"), "r") as f:
@@ -75,8 +75,8 @@ def read_reference_points(esx_floors, json_path):
             for point in reference["projections"]:
                 x = round(point["coord"]["x"])
                 y = round(point["coord"]["y"])
-                floor_index = next((index for index, floor in enumerate(esx_floors) if floor.id == point["floorPlanId"]), None)
-                esx_floors[floor_index].points.append([x,y])
+                floor_index = next((index for index, floor in enumerate(floors) if floor.id == point["floorPlanId"]), None)
+                floors[floor_index].points.append([x,y])
 
 
 def read_access_points(esx_aps, esx_floors, json_path):
@@ -89,40 +89,40 @@ def read_access_points(esx_aps, esx_floors, json_path):
         print(f"{status.info}Not found: {colorama.Fore.YELLOW}accessPoints.json{colorama.Fore.RESET}")
     else:
         for item in access_points["accessPoints"]:
-            if item["status"] != "DELETED":
-                ap = Ap(item["id"])
-                ap.name = item["name"]
-                ap.hidden = item["hidden"]
-                ap.mac = ""
-                ap.ssid = ""
-                try:
-                    ap.vendor = item["vendor"]
-                except KeyError:
-                    ap.vendor = ""
-                try:
-                    ap.model = item["model"]
-                except KeyError:
-                    ap.model = ""
-                try:
-                    ap.location_x = round(item["location"]["coord"]["x"])
-                except KeyError:
-                    ap.location_x = ""
-                try:
-                    ap.location_y = round(item["location"]["coord"]["y"])
-                except KeyError:
-                    ap.location_y = ""
-                try:
-                    ap.location_id = item["location"]["floorPlanId"]
-                    ap.location_name = next(floor.name for floor in esx_floors if floor.id == ap.location_id)
-                except KeyError:
-                    ap.location_id = ""
-                    ap.location_name = ""
-                try:
-                    ap.colour = item["color"]
-                except KeyError:
-                    ap.colour = ""
-            
-                esx_aps.append(ap)
+            #if item["status"] != "DELETED":
+            ap = Ap(item["id"])
+            ap.name = item["name"]
+            ap.hidden = item["hidden"]
+            ap.mac = ""
+            ap.ssid = ""
+            try:
+                ap.vendor = item["vendor"]
+            except KeyError:
+                ap.vendor = ""
+            try:
+                ap.model = item["model"]
+            except KeyError:
+                ap.model = ""
+            try:
+                ap.location_x = round(item["location"]["coord"]["x"])
+            except KeyError:
+                ap.location_x = ""
+            try:
+                ap.location_y = round(item["location"]["coord"]["y"])
+            except KeyError:
+                ap.location_y = ""
+            try:
+                ap.location_id = item["location"]["floorPlanId"]
+                ap.location_name = next(floor.name for floor in esx_floors if floor.id == ap.location_id)
+            except KeyError:
+                ap.location_id = ""
+                ap.location_name = ""
+            try:
+                ap.colour = item["color"]
+            except KeyError:
+                ap.colour = ""
+        
+            esx_aps.append(ap)
 
 
 def read_simulated_radios(esx_aps, json_path):
