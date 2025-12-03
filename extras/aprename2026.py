@@ -23,7 +23,10 @@ all_models = [
             "Catalyst IW9167I",
             "Wireless CW9176I",
             "Wireless CW9176D1",
-            "Wireless CW9178I"
+            "Wireless CW9178I",
+            "CW9172H",
+            "Wireless CW9179F (Boresight)",
+            "Wireless CW9179F (Wide)"
             ]
 
 internal_omni = [
@@ -38,7 +41,8 @@ internal_omni = [
             "Catalyst 9166",
             "Catalyst IW9167I",
             "Wireless CW9176I",
-            "Wireless CW9178I"
+            "Wireless CW9178I",
+            "CW9172H",
             ]
 
 internal_directional = [
@@ -57,10 +61,11 @@ antennas = {
             "9103" : "3",
             "9102" : "2",
             "9101" : "1",
+            "9179F": "F",
             "unknown" : "U", #Unknown external antenna
             "mixed" : "X", #Multiple different external antennas
             "internal" : "I", #Internal omni
-            "directional" : "T" #Internal directional 9166D/9124D - marked as T after discussions
+            "directional" : "D" #Internal directional
             }
 
 maps = {
@@ -176,7 +181,7 @@ def do_rename(input_file, output_file = "new-names.csv"):
             
             data = [old_ap_name, new_ap_name, row[FLOOR], ap_antennas, ap_model]
             writer.writerow(data)
-            #print(data)
+
 
 if __name__ == "__main__":
 
