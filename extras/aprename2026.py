@@ -74,6 +74,7 @@ maps = {
         "Congress_L0_Europe-Foyer" : "CONL0",
         "Congress_L0_Jade-Lounge" : "CONL0",
         "Congress_L1_Rooms-G" : "CONL1",
+        "Elicium_B0" : "ELCB0",
         "Elicium_B1" : "ELCB1",
         "Elicium_L0" : "ELCL0",
         "Elicium_L1" : "ELCL1",
