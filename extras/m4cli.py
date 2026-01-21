@@ -101,7 +101,7 @@ def generate_cli(csv_file, ap_mac_map):
 
 def save_cli(cli_1, cli_2, cli_3):
 
-    with open("wlc-cli.txt", "w") as t:
+    with open("wlc-cli-m4.txt", "w") as t:
         t.write("===== RF Tag commands =====\n\n")
         for line in cli_1: t.write(line)
         t.write("\n\n===== AP Channel configurations =====\n\n")
