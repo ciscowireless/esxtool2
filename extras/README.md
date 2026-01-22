@@ -18,6 +18,11 @@ Takes ESXTool --tocsv output, as input
 
 Creates 9800 CLI for configuring 9104 beamwidths as per Ekahau project
 
+**db10cli.py**
+
+Takes ESXTool --tocsv output, as input
+
+Creates 9800 CLI for configuring 9179F 6GHz channel plan as per Ekahau project
 
 
 
